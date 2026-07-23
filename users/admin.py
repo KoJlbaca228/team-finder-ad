@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import BaseUserCreationForm, UserChangeForm
 
+from .forms import normalize_phone, validate_github_url
 from .models import User
 
 
@@ -17,11 +18,23 @@ class AdminUserCreationForm(BaseUserCreationForm):
             "about",
         )
 
+    def clean_phone(self):
+        return normalize_phone(self.cleaned_data["phone"])
+
+    def clean_github_url(self):
+        return validate_github_url(self.cleaned_data.get("github_url"))
+
 
 class AdminUserChangeForm(UserChangeForm):
     class Meta(UserChangeForm.Meta):
         model = User
         fields = "__all__"
+
+    def clean_phone(self):
+        return normalize_phone(self.cleaned_data["phone"], self.instance)
+
+    def clean_github_url(self):
+        return validate_github_url(self.cleaned_data.get("github_url"))
 
 
 @admin.register(User)

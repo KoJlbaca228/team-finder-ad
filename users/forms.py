@@ -7,6 +7,30 @@ from django.db.models import Q
 from .models import User
 
 
+def normalize_phone(phone, instance=None):
+    if not re.fullmatch(r"(?:8|\+7)\d{10}", phone):
+        raise forms.ValidationError(
+            "Введите номер в формате 8XXXXXXXXXX или +7XXXXXXXXXX"
+        )
+
+    subscriber_number = phone[-10:]
+    normalized_phone = f"+7{subscriber_number}"
+    users = User.objects.filter(
+        Q(phone=normalized_phone) | Q(phone=f"8{subscriber_number}")
+    )
+    if instance and instance.pk:
+        users = users.exclude(pk=instance.pk)
+    if users.exists():
+        raise forms.ValidationError("Этот номер телефона уже используется")
+    return normalized_phone
+
+
+def validate_github_url(github_url):
+    if github_url and urlparse(github_url).hostname not in {"github.com", "www.github.com"}:
+        raise forms.ValidationError("Ссылка должна вести на GitHub")
+    return github_url
+
+
 class RegistrationForm(forms.ModelForm):
     password = forms.CharField(label="Пароль", widget=forms.PasswordInput)
 
@@ -39,23 +63,7 @@ class ProfileForm(forms.ModelForm):
         }
 
     def clean_phone(self):
-        phone = self.cleaned_data["phone"]
-        if not re.fullmatch(r"(?:8|\+7)\d{10}", phone):
-            raise forms.ValidationError("Введите номер в формате 8XXXXXXXXXX или +7XXXXXXXXXX")
-
-        subscriber_number = phone[-10:]
-        phone = f"+7{subscriber_number}"
-        users = User.objects.filter(
-            Q(phone=phone) | Q(phone=f"8{subscriber_number}")
-        )
-        if self.instance.pk:
-            users = users.exclude(pk=self.instance.pk)
-        if users.exists():
-            raise forms.ValidationError("Этот номер телефона уже используется")
-        return phone
+        return normalize_phone(self.cleaned_data["phone"], self.instance)
 
     def clean_github_url(self):
-        github_url = self.cleaned_data.get("github_url")
-        if github_url and urlparse(github_url).hostname not in {"github.com", "www.github.com"}:
-            raise forms.ValidationError("Ссылка должна вести на GitHub")
-        return github_url
+        return validate_github_url(self.cleaned_data.get("github_url"))
