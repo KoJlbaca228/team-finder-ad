@@ -75,7 +75,7 @@ def complete_project(request, project_id):
 @login_required(login_url="users:login")
 def toggle_participate(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
-    if project.owner == request.user or project.status != "open":
+    if project.owner == request.user:
         return JsonResponse({"status": "error"}, status=403)
 
     if project.participants.filter(pk=request.user.pk).exists():

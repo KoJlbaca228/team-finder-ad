@@ -76,7 +76,7 @@
                     </button>
                 {% endif %}
             {% else %}
-                {% if user.is_authenticated and project.status == "open" %}
+                {% if user.is_authenticated %}
                     <button id="participate-btn" class="black-button"
                             data-project="{{ project.id }}"
                             data-user-id="{{ request.user.id }}"

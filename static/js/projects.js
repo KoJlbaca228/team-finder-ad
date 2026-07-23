@@ -73,15 +73,29 @@
             const a = document.createElement("a");
             a.href = `/users/${userId}`;
             a.id = `participant-${userId}`;
-            a.innerHTML = `
-              <div class="participant-item">
-                <img src="${userAvatar}" alt="Аватар" class="participant-avatar">
-                <div class="participant-info">
-                  <span class="participant-name">${userName}</span>
-                  <span class="participant-role">Участник</span>
-                </div>
-              </div>
-            `;
+
+            const item = document.createElement("div");
+            item.className = "participant-item";
+
+            const avatar = document.createElement("img");
+            avatar.src = userAvatar;
+            avatar.alt = "Аватар";
+            avatar.className = "participant-avatar";
+
+            const info = document.createElement("div");
+            info.className = "participant-info";
+
+            const name = document.createElement("span");
+            name.className = "participant-name";
+            name.textContent = userName;
+
+            const role = document.createElement("span");
+            role.className = "participant-role";
+            role.textContent = "Участник";
+
+            info.append(name, role);
+            item.append(avatar, info);
+            a.append(item);
             participantsList.appendChild(a);
 
             participantsCount.textContent = parseInt(participantsCount.textContent) + 1;
