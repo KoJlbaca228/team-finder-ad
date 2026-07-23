@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
+from .avatar import create_default_avatar
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -17,6 +19,11 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("У суперпользователя is_staff должен быть True")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("У суперпользователя is_superuser должен быть True")
 
         return self.create_user(email, password, **extra_fields)
 
@@ -44,3 +51,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+    def save(self, *args, **kwargs):
+        if not self.avatar:
+            self.avatar = create_default_avatar(self.name)
+        super().save(*args, **kwargs)
