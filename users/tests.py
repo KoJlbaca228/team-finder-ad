@@ -189,7 +189,9 @@ class UserListAndVariantTests(TemporaryMediaTestCase):
         first_page = self.client.get(reverse("users:list"))
         second_page = self.client.get(reverse("users:list"), {"page": 2})
 
-        self.assertEqual(list(first_page.context["page_obj"]), list(reversed(users[1:])))
+        self.assertEqual(
+            list(first_page.context["page_obj"]), list(reversed(users[1:]))
+        )
         self.assertEqual(list(second_page.context["page_obj"]), [users[0]])
 
     def test_all_variant_one_user_filters(self):

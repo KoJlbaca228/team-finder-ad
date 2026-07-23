@@ -4,7 +4,6 @@ from django.db import transaction
 from projects.models import Project
 from users.models import User
 
-
 DEMO_PASSWORD = "TeamFinderDemo2026!"
 
 DEMO_USERS = (
@@ -75,7 +74,9 @@ class Command(BaseCommand):
                 f"проектов создано {created_projects}."
             )
         )
-        self.stdout.write(f"Пароль новых демонстрационных пользователей: {DEMO_PASSWORD}")
+        self.stdout.write(
+            f"Пароль новых демонстрационных пользователей: {DEMO_PASSWORD}"
+        )
 
     def _create_users(self):
         users = {}

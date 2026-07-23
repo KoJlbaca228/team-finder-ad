@@ -20,9 +20,7 @@ def user_list(request):
             "owners-of-participating-projects": {
                 "id__in": request.user.participated_projects.values("owner_id")
             },
-            "interested-in-my-projects": {
-                "favorites__owner": request.user
-            },
+            "interested-in-my-projects": {"favorites__owner": request.user},
             "participants-of-my-projects": {
                 "participated_projects__owner": request.user
             },
@@ -84,7 +82,9 @@ def login_user(request):
 
 @login_required(login_url="users:login")
 def edit_profile(request):
-    form = ProfileForm(request.POST or None, request.FILES or None, instance=request.user)
+    form = ProfileForm(
+        request.POST or None, request.FILES or None, instance=request.user
+    )
     if request.method == "POST" and form.is_valid():
         form.save()
         return redirect("users:detail", user_id=request.user.id)

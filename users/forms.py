@@ -26,7 +26,10 @@ def normalize_phone(phone, instance=None):
 
 
 def validate_github_url(github_url):
-    if github_url and urlparse(github_url).hostname not in {"github.com", "www.github.com"}:
+    if github_url and urlparse(github_url).hostname not in {
+        "github.com",
+        "www.github.com",
+    }:
         raise forms.ValidationError("Ссылка должна вести на GitHub")
     return github_url
 
