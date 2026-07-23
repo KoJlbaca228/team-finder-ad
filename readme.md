@@ -96,8 +96,9 @@ docker compose logs -f web
 docker compose down
 ```
 
-Данные PostgreSQL и загруженные изображения сохраняются в Docker volumes
-`postgres_data` и `media_data`.
+Данные PostgreSQL сохраняются в Docker volume `postgres_data`. Загруженные и
+сгенерированные изображения сохраняются в локальной папке `media`, общей для
+локального запуска Django и запуска через Docker.
 
 ## Локальный запуск Django
 
