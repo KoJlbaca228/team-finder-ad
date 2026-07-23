@@ -57,36 +57,66 @@ python -c "from django.core.management.utils import get_random_secret_key; print
 
 Запишите результат в `DJANGO_SECRET_KEY` файла `.env`.
 
-Запустите PostgreSQL:
+## Запуск в Docker
+
+Соберите и запустите Django вместе с PostgreSQL:
 
 ```bash
-docker compose up -d
+docker compose up --build -d
 ```
 
-Контейнер публикует PostgreSQL по адресу `localhost:5433`, потому что стандартный
-порт `5432` может быть занят локальным сервером PostgreSQL.
-
-Примените миграции:
-
-```bash
-python manage.py migrate
-```
+Контейнер `web` дождётся готовности базы, применит миграции, соберёт статику и
+запустит приложение по адресу <http://localhost:8000>.
 
 Создайте администратора:
 
 ```bash
-python manage.py createsuperuser
+docker compose exec web python manage.py createsuperuser
 ```
 
 Добавьте демонстрационные данные:
 
 ```bash
-python manage.py seed_demo_data
+docker compose exec web python manage.py seed_demo_data
+```
+
+Посмотреть логи:
+
+```bash
+docker compose logs -f web
 ```
 
 Команда идемпотентна: повторный запуск не создаёт дубликаты. Она создаёт трёх
 пользователей, по одному проекту от каждого, участников и избранное. Пароль
 демонстрационных пользователей выводится после выполнения команды.
+
+Остановить контейнеры:
+
+```bash
+docker compose down
+```
+
+Данные PostgreSQL и загруженные изображения сохраняются в Docker volumes
+`postgres_data` и `media_data`.
+
+## Локальный запуск Django
+
+Если Django должен работать из виртуального окружения, запустите только базу:
+
+```bash
+docker compose up -d db
+```
+
+Контейнер публикует PostgreSQL по адресу `localhost:5433`, потому что стандартный
+порт `5432` может быть занят локальным сервером PostgreSQL.
+
+Примените миграции и подготовьте данные:
+
+```bash
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py seed_demo_data
+```
 
 Запустите сервер:
 
@@ -97,13 +127,11 @@ python manage.py runserver
 Приложение будет доступно по адресу <http://localhost:8000>, административная
 панель — по адресу <http://localhost:8000/admin/>.
 
-Остановить PostgreSQL:
+Остановить базу:
 
 ```bash
 docker compose down
 ```
-
-Данные сохраняются в Docker volume `postgres_data`.
 
 ## Проверка
 
